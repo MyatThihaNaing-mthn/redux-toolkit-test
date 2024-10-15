@@ -4,7 +4,8 @@ import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
 import {useEffect, useRef} from 'react';
 import Notification from './components/Notification/Notification';
-import { sendCartData } from './store/cart-slice';
+import { fetchCart, sendCartData } from './store/cart-actions';
+
 function App() {
   const isCartVisible = useSelector(state => state.ui.cartIsVisible)
   const cart = useSelector(state => state.cart);
@@ -12,13 +13,18 @@ function App() {
   const dispatch = useDispatch();
   const notification = useSelector(state=> state.ui.notification)
 
+  useEffect(()=> {
+    dispatch(fetchCart())
+  }, [dispatch])
 
   useEffect(()=> {
     if(firstRender.current === true){
       firstRender.current = false
       return;
     }
-    dispatch(sendCartData(cart))
+    if(!cart.replaced){
+      dispatch(sendCartData(cart))
+    }
   }, [cart, dispatch])
 
   return (
